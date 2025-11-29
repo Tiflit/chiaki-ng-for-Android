@@ -10,25 +10,46 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Checkout the repository
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # Set up Java JDK 17
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
 
+      # Set up Android SDK
       - name: Set up Android SDK
         uses: android-actions/setup-android@v2
 
-      # 🔧 This is the critical fix
+      # ✅ Critical fix: accept SDK licenses automatically
       - name: Accept Android SDK licenses
         run: yes | sdkmanager --licenses
 
+      # ⚡ Cache Gradle dependencies
+      - name: Cache Gradle
+        uses: actions/cache@v3
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: ${{ runner.os }}-gradle
+
+      # ⚡ Cache Android SDK to avoid re-downloading
+      - name: Cache Android SDK
+        uses: actions/cache@v3
+        with:
+          path: ~/.android
+          key: ${{ runner.os }}-android-sdk-${{ hashFiles('**/*.gradle*') }}
+          restore-keys: ${{ runner.os }}-android-sdk
+
+      # Build the APK
       - name: Build APK
         run: ./gradlew assembleDebug
 
+      # Upload the built APK as an artifact
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
