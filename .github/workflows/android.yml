@@ -52,9 +52,10 @@ jobs:
       - name: Build debug APK
         working-directory: android
         run: |
-          export OPENSSL_ROOT_DIR=$GITHUB_WORKSPACE/android/app/.cxx/Debug/*/arm64-v8a/openssl/install
+          OPENSSL_DIR=$(find $GITHUB_WORKSPACE/android/app/.cxx/Debug -type d -path "*/arm64-v8a/openssl/install" | head -n1)
           ./gradlew --no-daemon --stacktrace assembleDebug \
-            -PcmakeArgs="-DOPENSSL_ROOT_DIR=$OPENSSL_ROOT_DIR -DOPENSSL_USE_STATIC_LIBS=ON -Dnanopb_DIR=$GITHUB_WORKSPACE/third-party/nanopb/extra -DPROTOBUF_PROTOC_EXECUTABLE=/usr/bin/protoc"
+            -PcmakeArgs="-DOPENSSL_ROOT_DIR=$OPENSSL_DIR -DOPENSSL_USE_STATIC_LIBS=ON -Dnanopb_DIR=$GITHUB_WORKSPACE/third-party/nanopb -DPROTOBUF_PROTOC_EXECUTABLE=/usr/bin/protoc"
+
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
