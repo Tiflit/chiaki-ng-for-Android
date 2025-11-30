@@ -10,24 +10,26 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout code (with submodules)
+      # Checkout code with submodules
       - name: Checkout code
         uses: actions/checkout@v3
         with:
           submodules: true
 
-      # Set up JDK (needed for Gradle)
+      # Set up JDK for Gradle
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
           java-version: '17'
           distribution: 'temurin'
 
-      # Accept Android SDK licenses
-      - name: Download Android SDK licenses
-        run: mkdir -p $ANDROID_HOME/licenses && echo -e "\n8933bad161af4178b9b9a6f2b9c3d7c3\n" > $ANDROID_HOME/licenses/android-sdk-license
+      # Accept Android SDK license
+      - name: Accept Android SDK license
+        run: |
+          mkdir -p $ANDROID_HOME/licenses
+          echo "8933bad161af4178b9b9a6f2b9c3d7c3" > $ANDROID_HOME/licenses/android-sdk-license
 
-      # Install Android SDK
+      # Install Android SDK components
       - name: Install Android SDK
         run: sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.2"
 
@@ -53,9 +55,9 @@ jobs:
       - name: Build APK
         run: ./gradlew assembleDebug
 
-      # Upload APK artifact
+      # Upload APK artifact (using v4)
       - name: Upload APK
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: chiaki-ng-apk
           path: app/build/outputs/apk/debug/app-debug.apk
