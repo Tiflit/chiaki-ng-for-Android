@@ -10,13 +10,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout code with submodules
+      # Checkout code
       - name: Checkout code
         uses: actions/checkout@v3
-        with:
-          submodules: true
 
-      # Set up JDK for Gradle
+      # Set up JDK
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
@@ -24,12 +22,12 @@ jobs:
           distribution: 'temurin'
 
       # Install Android SDK command-line tools
-      - name: Install Android SDK command-line tools
+      - name: Install Android SDK tools
         run: |
           mkdir -p $HOME/android-sdk/cmdline-tools
           cd $HOME/android-sdk/cmdline-tools
-          curl -s https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -o cmdline-tools.zip
-          unzip cmdline-tools.zip -d $HOME/android-sdk/cmdline-tools
+          curl -s https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -o tools.zip
+          unzip tools.zip -d $HOME/android-sdk/cmdline-tools
           mv $HOME/android-sdk/cmdline-tools/cmdline-tools $HOME/android-sdk/cmdline-tools/latest
           echo "ANDROID_HOME=$HOME/android-sdk" >> $GITHUB_ENV
           echo "PATH=$HOME/android-sdk/cmdline-tools/latest/bin:$HOME/android-sdk/platform-tools:$PATH" >> $GITHUB_ENV
@@ -44,31 +42,19 @@ jobs:
       - name: Install Android SDK packages
         run: sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.2"
 
-      # Cache Android SDK
-      - name: Cache Android SDK
-        uses: actions/cache@v3
-        with:
-          path: $HOME/android-sdk
-          key: android-sdk-${{ runner.os }}
-
-      # Cache Android NDK (optional, if native code is needed)
-      - name: Cache Android NDK
-        uses: actions/cache@v3
-        with:
-          path: $HOME/android-sdk/ndk
-          key: android-ndk-${{ runner.os }}
-
       # Generate Gradle wrapper if missing
       - name: Generate Gradle wrapper
+        working-directory: android
         run: gradle wrapper
 
       # Build APK (debug variant)
       - name: Build APK
+        working-directory: android
         run: ./gradlew assembleDebug
 
-      # Upload APK artifact (using v4)
+      # Upload APK artifact
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: chiaki-ng-apk
-          path: app/build/outputs/apk/debug/app-debug.apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
