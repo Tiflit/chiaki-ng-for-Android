@@ -26,7 +26,7 @@ jobs:
       - name: Accept Android SDK licenses
         run: yes | sdkmanager --licenses
 
-      # ✅ Install the exact SDK version your Gradle requires
+      # ✅ Install the exact SDK version required by your Gradle file
       - name: Install Android platform and build-tools
         run: |
           sdkmanager "platforms;android-30" "platform-tools" "build-tools;30.0.2"
