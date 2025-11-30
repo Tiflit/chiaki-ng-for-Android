@@ -10,30 +10,26 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout the repository
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Set up Java JDK 17
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
 
-      # Set up Android SDK
       - name: Set up Android SDK
         uses: android-actions/setup-android@v2
 
-      # ✅ Critical fix: accept SDK licenses automatically
+      # ✅ Accept SDK licenses automatically
       - name: Accept Android SDK licenses
         run: yes | sdkmanager --licenses
 
-      # ✅ Pre-install required Android platform and build-tools
-      # Adjust the version to match your app's compileSdkVersion in build.gradle
+      # ✅ Install the exact SDK version your Gradle requires
       - name: Install Android platform and build-tools
         run: |
-          sdkmanager "platforms;android-34" "platform-tools" "build-tools;34.0.0"
+          sdkmanager "platforms;android-30" "platform-tools" "build-tools;30.0.2"
 
       # ⚡ Cache Gradle dependencies
       - name: Cache Gradle
@@ -43,7 +39,7 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: ${{ runner.os }}-gradle
 
-      # ⚡ Cache Android SDK to avoid re-downloading
+      # ⚡ Cache Android SDK
       - name: Cache Android SDK
         uses: actions/cache@v3
         with:
@@ -51,11 +47,9 @@ jobs:
           key: ${{ runner.os }}-android-sdk-${{ hashFiles('**/*.gradle*') }}
           restore-keys: ${{ runner.os }}-android-sdk
 
-      # Build the APK
       - name: Build APK
         run: ./gradlew assembleDebug
 
-      # Upload the built APK as an artifact
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
