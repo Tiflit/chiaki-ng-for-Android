@@ -78,7 +78,7 @@ jobs:
         working-directory: android
         env:
           CMAKE_PREFIX_PATH: /usr/lib/x86_64-linux-gnu/cmake/Qt6
-          QT_DIR: /usr/lib/x86_64-linux-gnu/cmake/Qt6
+          Qt6_DIR: /usr/lib/x86_64-linux-gnu/cmake/Qt6
         run: |
           chmod +x gradlew
           ./gradlew --no-daemon --stacktrace assembleDebug \
@@ -89,7 +89,7 @@ jobs:
                          -Dnanopb_DIR=$GITHUB_WORKSPACE/third-party/nanopb/install/lib/cmake/nanopb \
                          -DPROTOBUF_PROTOC_EXECUTABLE=/usr/bin/protoc \
                          -DCMAKE_PREFIX_PATH=$CMAKE_PREFIX_PATH \
-                         -DQT_DIR=$QT_DIR"
+                         -DQt6_DIR=$Qt6_DIR"
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
