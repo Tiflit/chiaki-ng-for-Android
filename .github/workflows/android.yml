@@ -65,6 +65,8 @@ jobs:
 
       - name: Build OpenSSL for Android (cross-compile)
         run: |
+          export ANDROID_NDK_HOME=$ANDROID_HOME/ndk/27.0.12077973
+          export PATH=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin:$PATH
           git clone https://github.com/openssl/openssl.git --branch OpenSSL_1_1_1-stable --depth=1
           cd openssl
           ./Configure android-arm64 no-shared --prefix=$GITHUB_WORKSPACE/openssl-android
