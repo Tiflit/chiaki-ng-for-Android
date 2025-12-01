@@ -55,13 +55,21 @@ jobs:
             "cmake;3.22.1" \
             "ndk;27.0.12077973"
 
+      - name: Inject nanopb install config
+        continue-on-error: true
+        run: |
+          echo '
+          install(TARGETS protobuf-nanopb-static EXPORT nanopbConfig)
+          install(EXPORT nanopbConfig DESTINATION lib/cmake/nanopb)
+          ' >> third-party/nanopb/CMakeLists.txt
+
       - name: Build nanopb
         run: |
           cmake -S third-party/nanopb -B third-party/nanopb/build
           cmake --build third-party/nanopb/build
           cmake --install third-party/nanopb/build --prefix $GITHUB_WORKSPACE/third-party/nanopb/install
 
-      - name: Build OpenSSL for Android
+      - name: Build OpenSSL for Android (cross-compile)
         run: |
           git clone https://github.com/openssl/openssl.git --branch OpenSSL_1_1_1-stable --depth=1
           cd openssl
