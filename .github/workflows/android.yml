@@ -37,7 +37,14 @@ jobs:
       - name: Install build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y protobuf-compiler libspeexdsp-dev libidn2-0-dev
+          sudo apt-get install -y protobuf-compiler libspeexdsp-dev libidn2-0-dev libssl-dev
+
+      - name: Install Android command line tools
+        run: |
+          mkdir -p $ANDROID_HOME/cmdline-tools
+          curl -fo sdk.zip https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
+          unzip sdk.zip -d $ANDROID_HOME/cmdline-tools
+          mv $ANDROID_HOME/cmdline-tools/cmdline-tools $ANDROID_HOME/cmdline-tools/latest
 
       - name: Accept Android SDK licenses and install packages
         run: |
@@ -48,13 +55,18 @@ jobs:
             "build-tools;33.0.2" \
             "cmake;3.22.1" \
             "ndk;27.0.12077973"
-#Run test
+
+      - name: Build nanopb
+        run: |
+          cmake -S third-party/nanopb -B third-party/nanopb/build
+          cmake --build third-party/nanopb/build
+
       - name: Build debug APK
         working-directory: android
         run: |
           chmod +x gradlew
           ./gradlew --no-daemon --stacktrace assembleDebug \
-            -PcmakeArgs="-Dnanopb_DIR=$GITHUB_WORKSPACE/third-party/nanopb -DPROTOBUF_PROTOC_EXECUTABLE=/usr/bin/protoc"
+            -PcmakeArgs="-Dnanopb_DIR=$GITHUB_WORKSPACE/third-party/nanopb/build -DPROTOBUF_PROTOC_EXECUTABLE=/usr/bin/protoc"
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
