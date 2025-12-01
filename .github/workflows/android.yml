@@ -31,8 +31,7 @@ jobs:
             ~/.gradle/caches
             ~/.gradle/wrapper
           key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            gradle-${{ runner.os }}-
+          restore-keys: gradle-${{ runner.os }}-
 
       - name: Install build dependencies
         run: |
@@ -48,7 +47,7 @@ jobs:
 
       - name: Accept Android SDK licenses and install packages
         run: |
-          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
           $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager \
             "platform-tools" \
             "platforms;android-33" \
@@ -60,13 +59,24 @@ jobs:
         run: |
           cmake -S third-party/nanopb -B third-party/nanopb/build
           cmake --build third-party/nanopb/build
+          cmake --install third-party/nanopb/build --prefix $GITHUB_WORKSPACE/third-party/nanopb/install
+
+      - name: Build OpenSSL for Android
+        run: |
+          git clone https://github.com/openssl/openssl.git --branch OpenSSL_1_1_1-stable --depth=1
+          cd openssl
+          ./Configure android-arm64 no-shared --prefix=$GITHUB_WORKSPACE/openssl-android
+          make -j$(nproc)
+          make install_sw
 
       - name: Build debug APK
         working-directory: android
         run: |
           chmod +x gradlew
           ./gradlew --no-daemon --stacktrace assembleDebug \
-            -PcmakeArgs="-Dnanopb_DIR=$GITHUB_WORKSPACE/third-party/nanopb/build -DPROTOBUF_PROTOC_EXECUTABLE=/usr/bin/protoc"
+            -PcmakeArgs="-DOPENSSL_ROOT_DIR=$GITHUB_WORKSPACE/openssl-android \
+                         -Dnanopb_DIR=$GITHUB_WORKSPACE/third-party/nanopb/install/lib/cmake/nanopb \
+                         -DPROTOBUF_PROTOC_EXECUTABLE=/usr/bin/protoc"
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
