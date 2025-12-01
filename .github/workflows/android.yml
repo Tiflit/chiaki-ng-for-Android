@@ -7,14 +7,14 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     env:
       ANDROID_HOME: /usr/local/lib/android/sdk
       ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: true
 
@@ -36,7 +36,8 @@ jobs:
       - name: Install build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y protobuf-compiler libspeexdsp-dev libidn2-0-dev libssl-dev
+          sudo apt-get install -y protobuf-compiler libspeexdsp-dev libidn2-0-dev libssl-dev \
+                                  qt6-base-dev qt6-base-dev-tools qt6-tools-dev qt6-tools-dev-tools
 
       - name: Install Android command line tools
         run: |
@@ -75,6 +76,9 @@ jobs:
 
       - name: Build debug APK
         working-directory: android
+        env:
+          CMAKE_PREFIX_PATH: /usr/lib/x86_64-linux-gnu/cmake/Qt6
+          QT_DIR: /usr/lib/x86_64-linux-gnu/cmake/Qt6
         run: |
           chmod +x gradlew
           ./gradlew --no-daemon --stacktrace assembleDebug \
@@ -83,7 +87,9 @@ jobs:
                          -DOPENSSL_CRYPTO_LIBRARY=$GITHUB_WORKSPACE/openssl-android/lib/libcrypto.a \
                          -DOPENSSL_SSL_LIBRARY=$GITHUB_WORKSPACE/openssl-android/lib/libssl.a \
                          -Dnanopb_DIR=$GITHUB_WORKSPACE/third-party/nanopb/install/lib/cmake/nanopb \
-                         -DPROTOBUF_PROTOC_EXECUTABLE=/usr/bin/protoc"
+                         -DPROTOBUF_PROTOC_EXECUTABLE=/usr/bin/protoc \
+                         -DCMAKE_PREFIX_PATH=$CMAKE_PREFIX_PATH \
+                         -DQT_DIR=$QT_DIR"
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
