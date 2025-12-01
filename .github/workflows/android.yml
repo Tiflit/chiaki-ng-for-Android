@@ -52,9 +52,9 @@ jobs:
       - name: Build debug APK
         working-directory: android
         run: |
+          chmod +x gradlew
           ./gradlew --no-daemon --stacktrace assembleDebug \
             -PcmakeArgs="-Dnanopb_DIR=$GITHUB_WORKSPACE/third-party/nanopb -DPROTOBUF_PROTOC_EXECUTABLE=/usr/bin/protoc"
-
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
