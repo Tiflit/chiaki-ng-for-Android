@@ -55,20 +55,12 @@ jobs:
             "cmake;3.22.1" \
             "ndk;27.0.12077973"
 
-      - name: Inject nanopb install config
-        run: |
-          echo '
-          install(TARGETS protobuf-nanopb-static EXPORT nanopbConfig)
-          install(EXPORT nanopbConfig DESTINATION lib/cmake/nanopb)
-          ' >> third-party/nanopb/CMakeLists.txt
-          # Remove any attempt to install into Python site-packages
-          sed -i '/dist-packages/d' third-party/nanopb/CMakeLists.txt
-
-      - name: Build nanopb
+      - name: Build nanopb (static lib only)
         run: |
           cmake -S third-party/nanopb -B third-party/nanopb/build \
-            -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/third-party/nanopb/install
-          cmake --build third-party/nanopb/build
+            -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/third-party/nanopb/install \
+            -Dnanopb_BUILD_GENERATOR=OFF
+          cmake --build third-party/nanopb/build --target protobuf-nanopb-static
           cmake --install third-party/nanopb/build
 
       - name: Build OpenSSL for Android (cross-compile)
