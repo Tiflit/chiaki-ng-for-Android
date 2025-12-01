@@ -65,9 +65,11 @@ jobs:
 
       - name: Build nanopb
         run: |
-          cmake -S third-party/nanopb -B third-party/nanopb/build
+          cmake -S third-party/nanopb -B third-party/nanopb/build \
+            -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/third-party/nanopb/install \
+            -Dnanopb_INSTALL_PYTHON=OFF
           cmake --build third-party/nanopb/build
-          cmake --install third-party/nanopb/build --prefix $GITHUB_WORKSPACE/third-party/nanopb/install
+          cmake --install third-party/nanopb/build
 
       - name: Build OpenSSL for Android (cross-compile)
         run: |
