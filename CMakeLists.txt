@@ -29,6 +29,12 @@ tri_option(CHIAKI_ENABLE_PI_DECODER "Enable Raspberry Pi-specific video decoder 
 option(CHIAKI_LIB_ENABLE_MBEDTLS "Use mbedtls instead of OpenSSL as part of Chiaki Lib" OFF)
 option(CHIAKI_LIB_MBEDTLS_EXTERNAL_PROJECT "Fetch Mbed TLS instead of using system-provided libs" OFF)
 option(CHIAKI_LIB_OPENSSL_EXTERNAL_PROJECT "Use OpenSSL as CMake external project" OFF)
+if(CHIAKI_ENABLE_ANDROID)
+    # Disable external OpenSSL project when building for Android
+    set(CHIAKI_LIB_OPENSSL_EXTERNAL_PROJECT OFF CACHE BOOL "" FORCE)
+    # Prevent curl from hard‑requiring OpenSSL
+    set(CURL_DISABLE_OPENSSL ON CACHE BOOL "" FORCE)
+endif()
 option(CHIAKI_GUI_ENABLE_SDL_GAMECONTROLLER "Use SDL Gamecontroller for Input" ON)
 option(CHIAKI_CLI_ARGP_STANDALONE "Search for standalone argp lib for CLI" OFF)
 option(CHIAKI_ENABLE_STEAM_SHORTCUT "Add ability to create Steam shortcut" ON)
