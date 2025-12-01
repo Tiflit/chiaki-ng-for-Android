@@ -14,7 +14,7 @@
 
 # Uncomment this to preserve the line number information for
 # debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+-keepattributes SourceFile,LineNumberTable
 
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
@@ -23,6 +23,51 @@
 -dontobfuscate
 -keep class com.metallic.chiaki.** { *; }
 
+##########################################
+# Native Methods (CRITICAL for JNI)
+##########################################
+-keepclasseswithmembernames class * {
+    native <methods>;
+}
+
+##########################################
+# Room Database
+##########################################
+-keep class * extends androidx.room.RoomDatabase
+-keep @androidx.room.Entity class *
+-keep @androidx.room.Dao class *
+-dontwarn androidx.room.paging.**
+
+##########################################
+# RxJava
+##########################################
+-keep class io.reactivex.** { *; }
+-keep interface io.reactivex.** { *; }
+-dontwarn io.reactivex.**
+
+##########################################
+# Kotlin
+##########################################
+-keep class kotlin.Metadata { *; }
+-keepnames @kotlin.Metadata class com.metallic.chiaki.**
+
+##########################################
+# Parcelable
+##########################################
+-keep class * implements android.os.Parcelable {
+    public static final ** CREATOR;
+}
+
+##########################################
+# Keep annotations
+##########################################
+-keepattributes *Annotation*
+-keepattributes Signature
+-keepattributes Exceptions
+
+##########################################
+# Moshi (Your existing rules below)
+##########################################
 
 ##########################################
 # Moshi
