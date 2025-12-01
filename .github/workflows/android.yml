@@ -79,6 +79,9 @@ jobs:
           chmod +x gradlew
           ./gradlew --no-daemon --stacktrace assembleDebug \
             -PcmakeArgs="-DOPENSSL_ROOT_DIR=$GITHUB_WORKSPACE/openssl-android \
+                         -DOPENSSL_INCLUDE_DIR=$GITHUB_WORKSPACE/openssl-android/include \
+                         -DOPENSSL_CRYPTO_LIBRARY=$GITHUB_WORKSPACE/openssl-android/lib/libcrypto.a \
+                         -DOPENSSL_SSL_LIBRARY=$GITHUB_WORKSPACE/openssl-android/lib/libssl.a \
                          -Dnanopb_DIR=$GITHUB_WORKSPACE/third-party/nanopb/install/lib/cmake/nanopb \
                          -DPROTOBUF_PROTOC_EXECUTABLE=/usr/bin/protoc"
 
