@@ -53,7 +53,7 @@ jobs:
         working-directory: android
         run: |
           ./gradlew --no-daemon --stacktrace assembleDebug \
-            -PcmakeArgs="-DOPENSSL_ROOT_DIR=$OPENSSL_DIR -DOPENSSL_USE_STATIC_LIBS=ON -Dnanopb_DIR=$GITHUB_WORKSPACE/third-party/nanopb -DPROTOBUF_PROTOC_EXECUTABLE=/usr/bin/protoc"
+            -PcmakeArgs="-Dnanopb_DIR=$GITHUB_WORKSPACE/third-party/nanopb -DPROTOBUF_PROTOC_EXECUTABLE=/usr/bin/protoc"
 
 
       - name: Upload APK
