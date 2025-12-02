@@ -32,22 +32,6 @@ android {
         targetSdkVersion 34
         versionCode 11
         versionName chiakiVersion
-
-        externalNativeBuild {
-            cmake {
-                arguments "-DCHIAKI_ENABLE_TESTS=OFF",
-                          "-DCHIAKI_ENABLE_CLI=OFF",
-                          "-DCHIAKI_ENABLE_GUI=OFF",
-                          "-DCHIAKI_ENABLE_SETSU=OFF",
-                          "-DCHIAKI_ENABLE_ANDROID=ON",
-                          "-DCHIAKI_ENABLE_FFMPEG_DECODER=OFF",
-                          "-DCHIAKI_ENABLE_PI_DECODER=OFF",
-                          "-DCHIAKI_LIB_ENABLE_OPUS=OFF",
-                          "-DCHIAKI_LIB_OPENSSL_EXTERNAL_PROJECT=ON",
-                          "-DCHIAKI_ENABLE_STEAM_SHORTCUT=OFF",
-                          "-DPROTOBUF_PROTOC_EXECUTABLE=/usr/bin/protoc"
-            }
-        }
     }
 
     buildFeatures {
@@ -63,10 +47,32 @@ android {
         jvmTarget = "17"
     }
 
+    // ---- Consolidated externalNativeBuild ----
     externalNativeBuild {
         cmake {
             version "3.22.1"
             path rootCMakeLists
+            arguments "-DCHIAKI_ENABLE_ANDROID=ON",
+                      "-DCHIAKI_ENABLE_TESTS=OFF",
+                      "-DCHIAKI_ENABLE_CLI=OFF",
+                      "-DCHIAKI_ENABLE_GUI=OFF",
+                      "-DCHIAKI_ENABLE_SETSU=OFF",
+                      "-DCHIAKI_ENABLE_FFMPEG_DECODER=OFF",
+                      "-DCHIAKI_ENABLE_PI_DECODER=OFF",
+                      "-DCHIAKI_ENABLE_STEAM_SHORTCUT=OFF",
+                      "-DCHIAKI_ENABLE_STEAMDECK_NATIVE=OFF",
+                      "-DCHIAKI_LIB_ENABLE_OPUS=OFF",
+                      "-DCHIAKI_LIB_OPENSSL_EXTERNAL_PROJECT=OFF",
+                      "-DCURL_DISABLE_NGHTTP2=ON",
+                      "-DCURL_DISABLE_LIBSSH2=ON",
+                      "-DCURL_DISABLE_LIBPSL=ON",
+                      "-DCURL_DISABLE_LIBIDN2=ON",
+                      "-DPROTOBUF_PROTOC_EXECUTABLE=/usr/bin/protoc",
+                      "-Dnanopb_DIR=${project.rootDir}/../third-party/nanopb/install/lib/cmake/nanopb",
+                      "-DOPENSSL_ROOT_DIR=${project.rootDir}/../openssl-android",
+                      "-DOPENSSL_INCLUDE_DIR=${project.rootDir}/../openssl-android/include",
+                      "-DOPENSSL_CRYPTO_LIBRARY=${project.rootDir}/../openssl-android/lib/libcrypto.a",
+                      "-DOPENSSL_SSL_LIBRARY=${project.rootDir}/../openssl-android/lib/libssl.a"
         }
     }
 
@@ -101,13 +107,14 @@ android {
 }
 
 if (!cmakeArgsList.isEmpty()) {
-    android.defaultConfig.externalNativeBuild.cmake.arguments += cmakeArgsList
+    android.externalNativeBuild.cmake.arguments += cmakeArgsList
     println("Injected cmakeArgs: " + cmakeArgsList)
 }
 
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
     kotlinOptions {
-        freeCompilerArgs += "-Xuse-experimental=kotlin.ExperimentalUnsignedTypes"
+        // Updated flag to avoid deprecation warning
+        freeCompilerArgs += "-opt-in=kotlin.ExperimentalUnsignedTypes"
     }
 }
 
