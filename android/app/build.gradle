@@ -32,11 +32,16 @@ android {
         targetSdkVersion 34
         versionCode 11
         versionName chiakiVersion
+
+        // Explicit ABI filters (matches gradle.properties)
+        ndk {
+            abiFilters "arm64-v8a", "armeabi-v7a"
+        }
     }
 
     buildFeatures {
         viewBinding true
-        buildConfig true
+        buildConfig true   // replaces deprecated gradle.properties flag
     }
 
     compileOptions {
@@ -48,7 +53,6 @@ android {
         jvmTarget = "17"
     }
 
-    // ---- Consolidated externalNativeBuild ----
     externalNativeBuild {
         cmake {
             version "3.22.1"
@@ -89,6 +93,9 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'),
                           'proguard-rules.pro'
         }
+        debug {
+            minifyEnabled false   // keep debug builds readable
+        }
     }
 
     Properties properties = new Properties()
@@ -116,7 +123,6 @@ if (!cmakeArgsList.isEmpty()) {
 
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
     kotlinOptions {
-        // Updated flag to avoid deprecation warning
         freeCompilerArgs += "-opt-in=kotlin.ExperimentalUnsignedTypes"
     }
 }
