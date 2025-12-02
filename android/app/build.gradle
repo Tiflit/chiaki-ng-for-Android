@@ -33,12 +33,10 @@ android {
         versionCode 11
         versionName chiakiVersion
 
-        // Explicit ABI filters (matches gradle.properties)
         ndk {
             abiFilters "arm64-v8a", "armeabi-v7a"
         }
 
-        // Place CMake arguments here (AGP exposes 'arguments' only at this level or per buildType)
         externalNativeBuild {
             cmake {
                 arguments += [
@@ -53,10 +51,19 @@ android {
                     "-DCHIAKI_ENABLE_STEAMDECK_NATIVE=OFF",
                     "-DCHIAKI_LIB_ENABLE_OPUS=OFF",
                     "-DCHIAKI_LIB_OPENSSL_EXTERNAL_PROJECT=OFF",
+
+                    // curl: lib-only, no tool/examples/tests
+                    "-DBUILD_CURL_EXE=OFF",
+                    "-DCURL_ENABLE_LIB_ONLY=ON",
+                    "-DBUILD_TESTING=OFF",
+                    "-DCURL_DISABLE_TESTS=ON",
+                    "-DCURL_DISABLE_EXAMPLES=ON",
+
                     "-DCURL_DISABLE_NGHTTP2=ON",
                     "-DCURL_DISABLE_LIBSSH2=ON",
                     "-DCURL_DISABLE_LIBPSL=ON",
                     "-DCURL_DISABLE_LIBIDN2=ON",
+
                     "-DPROTOBUF_PROTOC_EXECUTABLE=/usr/bin/protoc",
                     "-Dnanopb_DIR=${project.rootDir}/../third-party/nanopb/install/lib/cmake/nanopb",
                     "-DOPENSSL_ROOT_DIR=${project.rootDir}/../openssl-android",
@@ -82,7 +89,6 @@ android {
         jvmTarget = "17"
     }
 
-    // Only path/version belong here
     externalNativeBuild {
         cmake {
             path rootCMakeLists
@@ -123,7 +129,6 @@ android {
     }
 }
 
-// Merge injected cmakeArgs from CI into the defaultConfig arguments
 if (!cmakeArgsList.isEmpty()) {
     android.defaultConfig.externalNativeBuild.cmake.arguments += cmakeArgsList
     println("Injected cmakeArgs: " + cmakeArgsList)
