@@ -1,16 +1,29 @@
+# IDE files
 *.iml
-.gradle
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
+.idea/
 .DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
-/app/release
+
+# Gradle
+.gradle/
+gradle-app.setting
+
+# Local SDK/NDK paths
+/local.properties
+
+# Build outputs
+/build/
+/app/release/
+*.apk
+*.ap_
+*.aab
+*.log
+
+# Native build intermediates
+.externalNativeBuild/
+.cxx/
+
+# Captures (screenshots/profiling)
+captures/
+
+# Signing keys
 keystore.jks
