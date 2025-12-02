@@ -37,11 +37,40 @@ android {
         ndk {
             abiFilters "arm64-v8a", "armeabi-v7a"
         }
+
+        // Place CMake arguments here (AGP exposes 'arguments' only at this level or per buildType)
+        externalNativeBuild {
+            cmake {
+                arguments += [
+                    "-DCHIAKI_ENABLE_ANDROID=ON",
+                    "-DCHIAKI_ENABLE_TESTS=OFF",
+                    "-DCHIAKI_ENABLE_CLI=OFF",
+                    "-DCHIAKI_ENABLE_GUI=OFF",
+                    "-DCHIAKI_ENABLE_SETSU=OFF",
+                    "-DCHIAKI_ENABLE_FFMPEG_DECODER=OFF",
+                    "-DCHIAKI_ENABLE_PI_DECODER=OFF",
+                    "-DCHIAKI_ENABLE_STEAM_SHORTCUT=OFF",
+                    "-DCHIAKI_ENABLE_STEAMDECK_NATIVE=OFF",
+                    "-DCHIAKI_LIB_ENABLE_OPUS=OFF",
+                    "-DCHIAKI_LIB_OPENSSL_EXTERNAL_PROJECT=OFF",
+                    "-DCURL_DISABLE_NGHTTP2=ON",
+                    "-DCURL_DISABLE_LIBSSH2=ON",
+                    "-DCURL_DISABLE_LIBPSL=ON",
+                    "-DCURL_DISABLE_LIBIDN2=ON",
+                    "-DPROTOBUF_PROTOC_EXECUTABLE=/usr/bin/protoc",
+                    "-Dnanopb_DIR=${project.rootDir}/../third-party/nanopb/install/lib/cmake/nanopb",
+                    "-DOPENSSL_ROOT_DIR=${project.rootDir}/../openssl-android",
+                    "-DOPENSSL_INCLUDE_DIR=${project.rootDir}/../openssl-android/include",
+                    "-DOPENSSL_CRYPTO_LIBRARY=${project.rootDir}/../openssl-android/lib/libcrypto.a",
+                    "-DOPENSSL_SSL_LIBRARY=${project.rootDir}/../openssl-android/lib/libssl.a"
+                ]
+            }
+        }
     }
 
     buildFeatures {
         viewBinding true
-        buildConfig true   // replaces deprecated gradle.properties flag
+        buildConfig true
     }
 
     compileOptions {
@@ -53,33 +82,11 @@ android {
         jvmTarget = "17"
     }
 
+    // Only path/version belong here
     externalNativeBuild {
         cmake {
-            version "3.22.1"
             path rootCMakeLists
-            arguments.addAll([
-                "-DCHIAKI_ENABLE_ANDROID=ON",
-                "-DCHIAKI_ENABLE_TESTS=OFF",
-                "-DCHIAKI_ENABLE_CLI=OFF",
-                "-DCHIAKI_ENABLE_GUI=OFF",
-                "-DCHIAKI_ENABLE_SETSU=OFF",
-                "-DCHIAKI_ENABLE_FFMPEG_DECODER=OFF",
-                "-DCHIAKI_ENABLE_PI_DECODER=OFF",
-                "-DCHIAKI_ENABLE_STEAM_SHORTCUT=OFF",
-                "-DCHIAKI_ENABLE_STEAMDECK_NATIVE=OFF",
-                "-DCHIAKI_LIB_ENABLE_OPUS=OFF",
-                "-DCHIAKI_LIB_OPENSSL_EXTERNAL_PROJECT=OFF",
-                "-DCURL_DISABLE_NGHTTP2=ON",
-                "-DCURL_DISABLE_LIBSSH2=ON",
-                "-DCURL_DISABLE_LIBPSL=ON",
-                "-DCURL_DISABLE_LIBIDN2=ON",
-                "-DPROTOBUF_PROTOC_EXECUTABLE=/usr/bin/protoc",
-                "-Dnanopb_DIR=${project.rootDir}/../third-party/nanopb/install/lib/cmake/nanopb",
-                "-DOPENSSL_ROOT_DIR=${project.rootDir}/../openssl-android",
-                "-DOPENSSL_INCLUDE_DIR=${project.rootDir}/../openssl-android/include",
-                "-DOPENSSL_CRYPTO_LIBRARY=${project.rootDir}/../openssl-android/lib/libcrypto.a",
-                "-DOPENSSL_SSL_LIBRARY=${project.rootDir}/../openssl-android/lib/libssl.a"
-            ])
+            version "3.22.1"
         }
     }
 
@@ -94,7 +101,7 @@ android {
                           'proguard-rules.pro'
         }
         debug {
-            minifyEnabled false   // keep debug builds readable
+            minifyEnabled false
         }
     }
 
@@ -116,8 +123,9 @@ android {
     }
 }
 
+// Merge injected cmakeArgs from CI into the defaultConfig arguments
 if (!cmakeArgsList.isEmpty()) {
-    android.externalNativeBuild.cmake.arguments.addAll(cmakeArgsList)
+    android.defaultConfig.externalNativeBuild.cmake.arguments += cmakeArgsList
     println("Injected cmakeArgs: " + cmakeArgsList)
 }
 
