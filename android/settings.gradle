@@ -1,2 +1,2 @@
-include ':app'
-rootProject.name='Chiaki'
+include(":app")
+rootProject.name = "chiaki-ng-for-Android"
