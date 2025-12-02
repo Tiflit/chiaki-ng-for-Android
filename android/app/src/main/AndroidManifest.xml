@@ -2,12 +2,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- Required permissions -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
-        android:allowBackup="true"
+        android:allowBackup="false"   <!-- safer: disable backup if not needed -->
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
@@ -15,6 +16,7 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
 
+        <!-- FileProvider for sharing files -->
         <provider
             android:authorities="com.metallic.chiaki.fileprovider"
             android:name="androidx.core.content.FileProvider"
@@ -22,11 +24,12 @@
             android:exported="false">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/filepaths"
-                />
+                android:resource="@xml/filepaths"/>
         </provider>
 
-        <activity android:name=".main.MainActivity"
+        <!-- Main launcher activity -->
+        <activity
+            android:name=".main.MainActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
             android:exported="true">
             <intent-filter>
@@ -35,15 +38,17 @@
             </intent-filter>
         </activity>
 
+        <!-- Streaming activity -->
         <activity
             android:name=".stream.StreamActivity"
             android:theme="@style/StreamTheme"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
             android:screenOrientation="userLandscape"/>
 
-        <activity
-            android:name=".settings.SettingsActivity" />
+        <!-- Settings -->
+        <activity android:name=".settings.SettingsActivity" />
 
+        <!-- Registration -->
         <activity
             android:name=".regist.RegistActivity"
             android:theme="@style/MageTheme"
@@ -55,6 +60,7 @@
             android:theme="@style/MageTheme"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize" />
 
+        <!-- Manual console editing -->
         <activity
             android:name=".manualconsole.EditManualConsoleActivity"
             android:theme="@style/MageTheme"
