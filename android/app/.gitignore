@@ -1,1 +1,12 @@
-/build
+# App module build outputs
+/build/
+*.apk
+*.ap_
+*.aab
+
+# Native build intermediates
+.externalNativeBuild/
+.cxx/
+
+# Captures (screenshots/profiling)
+captures/
