@@ -49,12 +49,19 @@ if(CHIAKI_ENABLE_ANDROID)
     set(CHIAKI_ENABLE_CLI OFF CACHE BOOL "" FORCE)
     set(CHIAKI_ENABLE_TESTS OFF CACHE BOOL "" FORCE)
 
-    # Ensure curl builds without optional desktop deps
+    # Force curl to build lib-only, no tool/examples/tests
     set(CHIAKI_USE_SYSTEM_CURL OFF CACHE BOOL "" FORCE)
+    set(BUILD_CURL_EXE OFF CACHE BOOL "" FORCE)
+    set(BUILD_TESTING OFF CACHE BOOL "" FORCE)
+    set(CURL_DISABLE_TESTS ON CACHE BOOL "" FORCE)
+    set(CURL_DISABLE_EXAMPLES ON CACHE BOOL "" FORCE)
+
+    # Disable optional curl deps not needed on Android
     set(CURL_DISABLE_NGHTTP2 ON CACHE BOOL "" FORCE)
     set(CURL_DISABLE_LIBSSH2 ON CACHE BOOL "" FORCE)
     set(CURL_DISABLE_LIBPSL ON CACHE BOOL "" FORCE)
     set(CURL_DISABLE_LIBIDN2 ON CACHE BOOL "" FORCE)
+
     # NOTE: Do NOT disable OpenSSL here — we want curl to use it.
 endif()
 
