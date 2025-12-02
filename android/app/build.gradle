@@ -52,27 +52,29 @@ android {
         cmake {
             version "3.22.1"
             path rootCMakeLists
-            arguments "-DCHIAKI_ENABLE_ANDROID=ON",
-                      "-DCHIAKI_ENABLE_TESTS=OFF",
-                      "-DCHIAKI_ENABLE_CLI=OFF",
-                      "-DCHIAKI_ENABLE_GUI=OFF",
-                      "-DCHIAKI_ENABLE_SETSU=OFF",
-                      "-DCHIAKI_ENABLE_FFMPEG_DECODER=OFF",
-                      "-DCHIAKI_ENABLE_PI_DECODER=OFF",
-                      "-DCHIAKI_ENABLE_STEAM_SHORTCUT=OFF",
-                      "-DCHIAKI_ENABLE_STEAMDECK_NATIVE=OFF",
-                      "-DCHIAKI_LIB_ENABLE_OPUS=OFF",
-                      "-DCHIAKI_LIB_OPENSSL_EXTERNAL_PROJECT=OFF",
-                      "-DCURL_DISABLE_NGHTTP2=ON",
-                      "-DCURL_DISABLE_LIBSSH2=ON",
-                      "-DCURL_DISABLE_LIBPSL=ON",
-                      "-DCURL_DISABLE_LIBIDN2=ON",
-                      "-DPROTOBUF_PROTOC_EXECUTABLE=/usr/bin/protoc",
-                      "-Dnanopb_DIR=${project.rootDir}/../third-party/nanopb/install/lib/cmake/nanopb",
-                      "-DOPENSSL_ROOT_DIR=${project.rootDir}/../openssl-android",
-                      "-DOPENSSL_INCLUDE_DIR=${project.rootDir}/../openssl-android/include",
-                      "-DOPENSSL_CRYPTO_LIBRARY=${project.rootDir}/../openssl-android/lib/libcrypto.a",
-                      "-DOPENSSL_SSL_LIBRARY=${project.rootDir}/../openssl-android/lib/libssl.a"
+            arguments.addAll([
+                "-DCHIAKI_ENABLE_ANDROID=ON",
+                "-DCHIAKI_ENABLE_TESTS=OFF",
+                "-DCHIAKI_ENABLE_CLI=OFF",
+                "-DCHIAKI_ENABLE_GUI=OFF",
+                "-DCHIAKI_ENABLE_SETSU=OFF",
+                "-DCHIAKI_ENABLE_FFMPEG_DECODER=OFF",
+                "-DCHIAKI_ENABLE_PI_DECODER=OFF",
+                "-DCHIAKI_ENABLE_STEAM_SHORTCUT=OFF",
+                "-DCHIAKI_ENABLE_STEAMDECK_NATIVE=OFF",
+                "-DCHIAKI_LIB_ENABLE_OPUS=OFF",
+                "-DCHIAKI_LIB_OPENSSL_EXTERNAL_PROJECT=OFF",
+                "-DCURL_DISABLE_NGHTTP2=ON",
+                "-DCURL_DISABLE_LIBSSH2=ON",
+                "-DCURL_DISABLE_LIBPSL=ON",
+                "-DCURL_DISABLE_LIBIDN2=ON",
+                "-DPROTOBUF_PROTOC_EXECUTABLE=/usr/bin/protoc",
+                "-Dnanopb_DIR=${project.rootDir}/../third-party/nanopb/install/lib/cmake/nanopb",
+                "-DOPENSSL_ROOT_DIR=${project.rootDir}/../openssl-android",
+                "-DOPENSSL_INCLUDE_DIR=${project.rootDir}/../openssl-android/include",
+                "-DOPENSSL_CRYPTO_LIBRARY=${project.rootDir}/../openssl-android/lib/libcrypto.a",
+                "-DOPENSSL_SSL_LIBRARY=${project.rootDir}/../openssl-android/lib/libssl.a"
+            ])
         }
     }
 
@@ -107,7 +109,7 @@ android {
 }
 
 if (!cmakeArgsList.isEmpty()) {
-    android.externalNativeBuild.cmake.arguments += cmakeArgsList
+    android.externalNativeBuild.cmake.arguments.addAll(cmakeArgsList)
     println("Injected cmakeArgs: " + cmakeArgsList)
 }
 
