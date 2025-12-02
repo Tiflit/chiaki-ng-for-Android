@@ -1,29 +1,24 @@
 name: Android CI
-
 on:
   push:
     branches: [ main ]
   pull_request:
-
 jobs:
   build:
     runs-on: ubuntu-22.04
     env:
       ANDROID_HOME: /usr/local/lib/android/sdk
       ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           submodules: true
-
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
           java-version: '17'
           distribution: 'temurin'
-
       - name: Cache Gradle
         uses: actions/cache@v3
         with:
@@ -32,20 +27,16 @@ jobs:
             ~/.gradle/wrapper
           key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: gradle-${{ runner.os }}-
-
       - name: Install build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y protobuf-compiler libspeexdsp-dev libidn2-0-dev libssl-dev \
-                                  qt6-base-dev qt6-base-dev-tools qt6-tools-dev qt6-tools-dev-tools
-
+          sudo apt-get install -y protobuf-compiler libspeexdsp-dev libidn2-0-dev libssl-dev
       - name: Install Android command line tools
         run: |
           mkdir -p $ANDROID_HOME/cmdline-tools
           curl -fo sdk.zip https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
           unzip sdk.zip -d $ANDROID_HOME/cmdline-tools
           mv $ANDROID_HOME/cmdline-tools/cmdline-tools $ANDROID_HOME/cmdline-tools/latest
-
       - name: Accept Android SDK licenses and install packages
         run: |
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_HOME --licenses || true
@@ -55,7 +46,6 @@ jobs:
             "build-tools;33.0.2" \
             "cmake;3.22.1" \
             "ndk;27.0.12077973"
-
       - name: Build nanopb (static lib only)
         run: |
           cmake -S third-party/nanopb -B third-party/nanopb/build \
@@ -63,7 +53,6 @@ jobs:
             -Dnanopb_BUILD_GENERATOR=OFF
           cmake --build third-party/nanopb/build --target protobuf-nanopb-static
           cmake --install third-party/nanopb/build
-
       - name: Build OpenSSL for Android (cross-compile)
         run: |
           export ANDROID_NDK_HOME=$ANDROID_HOME/ndk/27.0.12077973
@@ -73,12 +62,8 @@ jobs:
           ./Configure android-arm64 no-shared --prefix=$GITHUB_WORKSPACE/openssl-android
           make -j$(nproc)
           make install_sw
-
       - name: Build debug APK
         working-directory: android
-        env:
-          CMAKE_PREFIX_PATH: /usr/lib/x86_64-linux-gnu/cmake/Qt6
-          Qt6_DIR: /usr/lib/x86_64-linux-gnu/cmake/Qt6
         run: |
           chmod +x gradlew
           ./gradlew --no-daemon --stacktrace assembleDebug \
@@ -87,10 +72,7 @@ jobs:
                          -DOPENSSL_CRYPTO_LIBRARY=$GITHUB_WORKSPACE/openssl-android/lib/libcrypto.a \
                          -DOPENSSL_SSL_LIBRARY=$GITHUB_WORKSPACE/openssl-android/lib/libssl.a \
                          -Dnanopb_DIR=$GITHUB_WORKSPACE/third-party/nanopb/install/lib/cmake/nanopb \
-                         -DPROTOBUF_PROTOC_EXECUTABLE=/usr/bin/protoc \
-                         -DCMAKE_PREFIX_PATH=$CMAKE_PREFIX_PATH \
-                         -DQt6_DIR=$Qt6_DIR"
-
+                         -DPROTOBUF_PROTOC_EXECUTABLE=/usr/bin/protoc"
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
