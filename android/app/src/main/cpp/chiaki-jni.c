@@ -603,12 +603,25 @@ JNIEXPORT void JNICALL JNI_FCN(discoveryServiceCreate)(JNIEnv *env, jobject obj,
 	options.cb = android_discovery_service_cb;
 	options.cb_user = service;
 
-	err = sockaddr_from_java(env, E->GetObjectField(env, options_obj, E->GetFieldID(env, options_class, "sendAddr", "Ljava/net/InetSocketAddress;")), &options.send_addr, &options.send_addr_size);
-	if(err != CHIAKI_ERR_SUCCESS)
-	{
-		CHIAKI_LOGE(&global_log, "Failed to get sockaddr from InetSocketAddress");
-		goto beach;
-	}
+struct sockaddr *tmp_addr = NULL;
+size_t tmp_addr_size = 0;
+
+err = sockaddr_from_java(env,
+    E->GetObjectField(env, options_obj,
+        E->GetFieldID(env, options_class, "sendAddr", "Ljava/net/InetSocketAddress;")),
+    &tmp_addr,
+    &tmp_addr_size);
+
+if (err == CHIAKI_ERR_SUCCESS && tmp_addr) {
+    if (tmp_addr_size <= sizeof(options.send_addr)) {
+        memcpy(&options.send_addr, tmp_addr, tmp_addr_size);
+        options.send_addr_size = tmp_addr_size;
+    } else {
+        CHIAKI_LOGE(&global_log, "Sockaddr size too large");
+        err = CHIAKI_ERR_INVALID_DATA;
+    }
+    free(tmp_addr); // because sockaddr_from_java allocates with CHIAKI_NEW
+}
 
 	service->java_service = E->NewGlobalRef(env, java_service);
 	service->java_service_class = E->GetObjectClass(env, service->java_service);
