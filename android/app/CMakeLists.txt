@@ -37,3 +37,6 @@ target_link_libraries(chiaki-jni PRIVATE
 # Oboe (vendored, only once)
 add_subdirectory(src/main/cpp/oboe)
 target_compile_options(oboe PRIVATE -include cassert)
+target_include_directories(chiaki-jni PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/main/cpp/oboe/include
+)
