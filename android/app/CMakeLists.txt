@@ -13,6 +13,13 @@ add_library(chiaki-jni SHARED
     src/main/cpp/audio-output.cpp
 )
 
+# Ensure JNI sees chiaki headers
+target_include_directories(chiaki-jni
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/main/cpp
+        ${CMAKE_SOURCE_DIR}/lib/include
+)
+
 # Link against the core Chiaki library
 target_link_libraries(chiaki-jni PRIVATE chiaki-lib)
 
