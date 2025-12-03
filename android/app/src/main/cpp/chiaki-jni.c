@@ -21,6 +21,20 @@
 #include "log.h"
 #include "chiaki-jni.h"
 
+// Adapter to match ChiakiVideoSampleCallback signature from chiaki/session.h
+// Expected: bool (*)(uint8_t *data, size_t size, int frame_type, bool is_keyframe, void *user)
+// Your decoder: bool (*)(uint8_t *data, size_t size, void *user)
+static bool android_video_sample_adapter(uint8_t *data,
+                                         size_t size,
+                                         int frame_type,
+                                         bool is_keyframe,
+                                         void *user)
+{
+    (void)frame_type;
+    (void)is_keyframe;
+    return android_chiaki_video_decoder_video_sample(data, size, user);
+}
+
 static char *strdup_jni(const char *str)
 {
 	if(!str)
@@ -347,8 +361,7 @@ JNIEXPORT void JNICALL JNI_FCN(sessionCreate)(JNIEnv *env, jobject obj, jobject 
 	session->java_controller_touch_id = E->GetFieldID(env, controller_touch_class, "id", "B");
 
 	chiaki_session_set_event_cb(&session->session, android_chiaki_event_cb, session);
-	chiaki_session_set_video_sample_cb(&session->session, android_chiaki_video_decoder_video_sample, &session->video_decoder);
-
+	chiaki_session_set_video_sample_cb(&session->session, android_video_sample_adapter, &session->video_decoder);
 	ChiakiAudioSink audio_sink;
 	android_chiaki_audio_decoder_get_sink(&session->audio_decoder, &audio_sink);
 	chiaki_session_set_audio_sink(&session->session, &audio_sink);
