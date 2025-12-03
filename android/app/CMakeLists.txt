@@ -36,4 +36,4 @@ target_link_libraries(chiaki-jni PRIVATE
 
 # Oboe (vendored, only once)
 add_subdirectory(src/main/cpp/oboe)
-target_link_libraries(chiaki-jni PRIVATE oboe)
+target_compile_options(oboe PRIVATE -include cassert)
