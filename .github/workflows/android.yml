@@ -72,6 +72,9 @@ jobs:
           make -j$(nproc)
           make install_sw
 
+      - name: Clean CMake build dirs
+        run: rm -rf android/app/.cxx android/build/intermediates/cxx
+
       - name: Clean Gradle build
         working-directory: android
         run: ./gradlew clean
@@ -82,6 +85,11 @@ jobs:
           chmod +x gradlew
           ./gradlew --no-daemon --stacktrace assembleDebug \
             -PcmakeArgs="-DCHIAKI_ENABLE_ANDROID=ON \
+                         -DBUILD_EXAMPLES=OFF \
+                         -DBUILD_TESTING=OFF \
+                         -DBUILD_CURL_EXE=OFF \
+                         -DCURL_DISABLE_TESTS=ON \
+                         -DCURL_DISABLE_EXAMPLES=ON \
                          -DOPENSSL_ROOT_DIR=$GITHUB_WORKSPACE/openssl-android \
                          -DOPENSSL_INCLUDE_DIR=$GITHUB_WORKSPACE/openssl-android/include \
                          -DOPENSSL_CRYPTO_LIBRARY=$GITHUB_WORKSPACE/openssl-android/lib/libcrypto.a \
