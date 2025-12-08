@@ -90,6 +90,11 @@ jobs:
                          -DBUILD_CURL_EXE=OFF \
                          -DCURL_DISABLE_TESTS=ON \
                          -DCURL_DISABLE_EXAMPLES=ON \
+                         -DCURL_DISABLE_LIBPSL=ON \
+                         -DCMAKE_DISABLE_FIND_PACKAGE_json-c=ON \
+                         -DCMAKE_DISABLE_FIND_PACKAGE_miniupnpc=ON \
+                         -DCMAKE_DISABLE_FIND_PACKAGE_NGHTTP2=ON \
+                         -DCMAKE_DISABLE_FIND_PACKAGE_Libidn2=ON \
                          -DOPENSSL_ROOT_DIR=$GITHUB_WORKSPACE/openssl-android \
                          -DOPENSSL_INCLUDE_DIR=$GITHUB_WORKSPACE/openssl-android/include \
                          -DOPENSSL_CRYPTO_LIBRARY=$GITHUB_WORKSPACE/openssl-android/lib/libcrypto.a \
