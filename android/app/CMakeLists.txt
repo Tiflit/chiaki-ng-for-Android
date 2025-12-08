@@ -20,6 +20,9 @@ target_include_directories(chiaki-jni
         ${CMAKE_SOURCE_DIR}/lib/include
 )
 
+# --- NEW: pull in the core Chiaki library ---
+add_subdirectory(${CMAKE_SOURCE_DIR}/lib ${CMAKE_BINARY_DIR}/chiaki-lib-build)
+
 # Link against the core Chiaki library
 target_link_libraries(chiaki-jni PRIVATE chiaki-lib)
 
