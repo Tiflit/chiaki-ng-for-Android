@@ -57,9 +57,11 @@
 #include <json-c/json_pointer.h>
 #endif
 
+#if defined(HAVE_MINIUPNPC)
 #include <miniupnpc/miniupnpc.h>
 #include <miniupnpc/upnpcommands.h>
 #include <miniupnpc/upnperrors.h>
+#endif
 
 #include <chiaki/remote/holepunch.h>
 #include <chiaki/stoppipe.h>
