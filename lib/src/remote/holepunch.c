@@ -50,7 +50,11 @@
 #endif
 
 #include <curl/curl.h>
+
+#if defined(HAVE_JSON_C)
 #include <json-c/json_object.h>
+#endif
+
 #include <json-c/json_tokener.h>
 #include <json-c/json_pointer.h>
 #include <miniupnpc/miniupnpc.h>
