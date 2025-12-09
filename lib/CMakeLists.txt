@@ -1,3 +1,4 @@
+# Headers
 set(HEADER_FILES
     include/chiaki/session.h
     include/chiaki/common.h
@@ -41,8 +42,10 @@ set(HEADER_FILES
     include/chiaki/bitstream.h
     include/chiaki/remote/holepunch.h
     include/chiaki/remote/rudp.h
-    include/chiaki/remote/rudpsendbuffer.h)
+    include/chiaki/remote/rudpsendbuffer.h
+)
 
+# Sources
 set(SOURCE_FILES
     src/common.c
     src/sock.c
@@ -86,8 +89,11 @@ set(SOURCE_FILES
     src/bitstream.c
     src/remote/holepunch.c
     src/remote/rudp.c
-    src/remote/rudpsendbuffer.c)
+    src/remote/rudpsendbuffer.c
+    src/ps_helpers.c          # NEW: PS address/port helper stubs or implementations
+)
 
+# Optional decoders
 if(CHIAKI_ENABLE_FFMPEG_DECODER)
     list(APPEND HEADER_FILES include/chiaki/ffmpegdecoder.h)
     list(APPEND SOURCE_FILES src/ffmpegdecoder.c)
@@ -100,26 +106,33 @@ if(CHIAKI_ENABLE_PI_DECODER)
 endif()
 set(CHIAKI_LIB_ENABLE_PI_DECODER "${CHIAKI_ENABLE_PI_DECODER}")
 
+# Protobuf
 add_subdirectory(protobuf)
 set_source_files_properties(${CHIAKI_LIB_PROTO_SOURCE_FILES} ${CHIAKI_LIB_PROTO_HEADER_FILES} PROPERTIES GENERATED TRUE)
 include_directories("${CHIAKI_LIB_PROTO_INCLUDE_DIR}")
 
+# Opus (optional)
 if(CHIAKI_LIB_ENABLE_OPUS)
     find_package(Opus REQUIRED)
     include_directories(${Opus_INCLUDE_DIRS})
 endif()
 
+# Library target
 add_library(chiaki-lib ${HEADER_FILES} ${SOURCE_FILES} ${CHIAKI_LIB_PROTO_SOURCE_FILES} ${CHIAKI_LIB_PROTO_HEADER_FILES})
 configure_file(config.h.in include/chiaki/config.h)
 target_include_directories(chiaki-lib PUBLIC "${CMAKE_CURRENT_BINARY_DIR}/include")
+target_include_directories(chiaki-lib PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
+# Warnings
 if(CMAKE_C_COMPILER_ID STREQUAL GNU OR CMAKE_C_COMPILER_ID STREQUAL Clang)
     target_compile_options(chiaki-lib PRIVATE -Wall)
 endif()
 
+# Dependencies
 add_dependencies(chiaki-lib chiaki-pb)
 set_target_properties(chiaki-lib PROPERTIES OUTPUT_NAME chiaki)
 
+# Platform libs
 if(WIN32)
     target_link_libraries(chiaki-lib wsock32 ws2_32 bcrypt iphlpapi)
 endif()
@@ -128,12 +141,10 @@ if(APPLE)
     target_link_libraries(chiaki-lib "-framework CoreServices")
 endif()
 
-target_include_directories(chiaki-lib PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
-
 find_package(Threads REQUIRED)
 target_link_libraries(chiaki-lib Threads::Threads)
 
-# Optional json-c support
+# Optional json-c support (needed only for real holepunch)
 if(CHIAKI_ENABLE_JSON_C)
     if (CHIAKI_IS_SWITCH)
         find_library(JSONC_LIB json-c ${PORTLIBS}/lib)
@@ -147,15 +158,17 @@ if(CHIAKI_ENABLE_JSON_C)
     endif()
 endif()
 
-# Optional miniupnpc support
+# Optional miniupnpc support (needed only for real holepunch)
 if(CHIAKI_ENABLE_MINIUPNPC)
     find_package(PkgConfig REQUIRED)
     pkg_search_module(MINIUPNPC REQUIRED miniupnpc IMPORTED_TARGET)
     target_link_libraries(chiaki-lib PkgConfig::MINIUPNPC)
 endif()
 
+# Curl (always)
 target_link_libraries(chiaki-lib CURL::libcurl)
 
+# TLS: prefer external or system find
 if(CHIAKI_LIB_ENABLE_MBEDTLS)
     if(CHIAKI_LIB_MBEDTLS_EXTERNAL_PROJECT)
         target_link_libraries(chiaki-lib mbedtls mbedx509 mbedcrypto)
@@ -172,21 +185,26 @@ else()
     target_link_libraries(chiaki-lib OpenSSL::Crypto)
 endif()
 
+# Jerasure and Nanopb
 target_link_libraries(chiaki-lib Nanopb::nanopb)
 target_link_libraries(chiaki-lib Jerasure::Jerasure)
 
+# Optional FFmpeg
 if(CHIAKI_ENABLE_FFMPEG_DECODER)
     target_link_libraries(chiaki-lib FFMPEG::avcodec FFMPEG::avutil)
 endif()
 
+# Optional Raspberry Pi decoder
 if(CHIAKI_ENABLE_PI_DECODER)
     target_link_libraries(chiaki-lib ILClient::ILClient)
 endif()
 
+# Optional Opus
 if(CHIAKI_LIB_ENABLE_OPUS)
     target_link_libraries(chiaki-lib ${Opus_LIBRARIES})
 endif()
 
+# Tests (optional)
 if(CHIAKI_ENABLE_TESTS)
     add_executable(holepunch-test include/chiaki/remote/holepunch.h src/remote/holepunch-test.c)
     target_link_libraries(holepunch-test chiaki-lib)
