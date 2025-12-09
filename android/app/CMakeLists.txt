@@ -13,6 +13,8 @@ add_library(chiaki-jni SHARED
     src/main/cpp/audio-output.cpp
 )
 
+target_sources(chiaki-jni PRIVATE src/main/cpp/openssl_ui_stubs.c)
+
 # Ensure JNI sees chiaki headers
 target_include_directories(chiaki-jni
     PRIVATE
