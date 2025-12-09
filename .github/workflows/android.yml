@@ -43,7 +43,10 @@ jobs:
             libjson-c-dev \
             libminiupnpc-dev \
             libpsl-dev \
-            libnghttp2-dev
+            libnghttp2-dev \
+            python3-protobuf \
+            python3-grpcio \
+            python3-grpcio-tools
 
       - name: Install Android command line tools
         run: |
