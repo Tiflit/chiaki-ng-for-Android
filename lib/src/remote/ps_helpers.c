@@ -4,18 +4,20 @@
  * Stub implementations for PS address/port helpers when not available.
  */
 
-#include <chiaki/session.h>
-#include <chiaki/ctrl.h>
+#include <chiaki/remote/holepunch.h>
 #include <stdint.h>
 
-const char *chiaki_get_ps_selected_addr(ChiakiSession *session)
+// Stub: fill ps_ip with an empty string
+void chiaki_get_ps_selected_addr(ChiakiHolepunchSession session, char *ps_ip)
 {
     (void)session;
-    return NULL; // stub: no selected address
+    if (ps_ip)
+        ps_ip[0] = '\0';
 }
 
-uint16_t chiaki_get_ps_ctrl_port(ChiakiSession *session)
+// Stub: return a safe default port
+uint16_t chiaki_get_ps_ctrl_port(ChiakiHolepunchSession session)
 {
     (void)session;
-    return 9307; // stub: default control port
+    return 9307; // default control port
 }
