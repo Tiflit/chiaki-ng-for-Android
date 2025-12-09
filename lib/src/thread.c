@@ -93,6 +93,23 @@ CHIAKI_EXPORT ChiakiErrorCode chiaki_thread_timedjoin(ChiakiThread *thread, void
 }
 #endif
 
+CHIAKI_EXPORT ChiakiErrorCode chiaki_thread_join(ChiakiThread *thread, void **retval)
+{
+#ifdef _WIN32
+    DWORD r = WaitForSingleObject(thread->thread, INFINITE);
+    if(r != WAIT_OBJECT_0)
+        return CHIAKI_ERR_THREAD;
+    if(retval)
+        *retval = thread->ret;
+    return CHIAKI_ERR_SUCCESS;
+#else
+    int r = pthread_join(thread->thread, retval);
+    if(r != 0)
+        return CHIAKI_ERR_THREAD;
+    return CHIAKI_ERR_SUCCESS;
+#endif
+}
+
 //#define CHIAKI_WINDOWS_THREAD_NAME
 
 CHIAKI_EXPORT ChiakiErrorCode chiaki_thread_set_name(ChiakiThread *thread, const char *name)
