@@ -36,6 +36,7 @@
 #include <ws2tcpip.h>
 #else
 #include <unistd.h>
+#include <netinet/in.h>
 #endif
 
 #ifdef __cplusplus
