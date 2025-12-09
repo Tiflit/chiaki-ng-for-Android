@@ -90,7 +90,7 @@ set(SOURCE_FILES
     src/remote/holepunch.c
     src/remote/rudp.c
     src/remote/rudpsendbuffer.c
-    src/ps_helpers.c          # NEW: PS address/port helper stubs or implementations
+    src/remote/ps_helpers.c          # NEW: PS address/port helper stubs or implementations
 )
 
 # Optional decoders
