@@ -53,17 +53,49 @@
 
 #include <curl/curl.h>
 
-#if defined(HAVE_JSON_C)
-#include <json-c/json_object.h>
-#include <json-c/json_tokener.h>
-#include <json-c/json_pointer.h>
-#endif
+#if defined(HAVE_JSON_C) && defined(HAVE_MINIUPNPC)
 
-#if defined(HAVE_MINIUPNPC)
-#include <miniupnpc/miniupnpc.h>
-#include <miniupnpc/upnpcommands.h>
-#include <miniupnpc/upnperrors.h>
-#endif
+/* real holepunch implementation goes here */
+
+#else
+
+#include <chiaki/log.h>
+#include <chiaki/session.h>
+#include <chiaki/sock.h>
+#include <chiaki/remote/holepunch.h>
+
+// Forward declaration if HolepunchSession is not visible here
+typedef struct HolepunchSession HolepunchSession;
+
+void chiaki_holepunch_init(ChiakiLog *log) {
+    CHIAKI_LOGI(log, "Holepunch disabled (no json-c/miniupnpc)");
+}
+
+void chiaki_holepunch_session_fini(HolepunchSession *hp) {
+    (void)hp;
+}
+
+ChiakiSock *chiaki_get_holepunch_sock(ChiakiSession *session) {
+    (void)session;
+    return NULL;
+}
+
+const void *chiaki_get_regist_info(ChiakiSession *session) {
+    (void)session;
+    return NULL;
+}
+
+int holepunch_session_create_offer(HolepunchSession *hp) {
+    (void)hp;
+    return 0;
+}
+
+int chiaki_holepunch_session_punch_hole(HolepunchSession *hp) {
+    (void)hp;
+    return 0;
+}
+
+#endif /* HAVE_JSON_C && HAVE_MINIUPNPC */
 
 #include <chiaki/remote/holepunch.h>
 #include <chiaki/stoppipe.h>
