@@ -38,6 +38,10 @@ target_link_libraries(chiaki-jni PRIVATE
 
 # --- Oboe (vendored subproject) ---
 add_subdirectory(src/main/cpp/oboe)
+# Force-include <cassert> for Oboe sources via a local shim
+target_compile_options(oboe PRIVATE
+    -include ${CMAKE_CURRENT_SOURCE_DIR}/src/main/cpp/oboe_assert_fix.h
+)
 
 # Link chiaki-jni against oboe
 target_link_libraries(chiaki-jni PRIVATE oboe)
