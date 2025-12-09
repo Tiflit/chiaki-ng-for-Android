@@ -44,9 +44,7 @@ jobs:
             libminiupnpc-dev \
             libpsl-dev \
             libnghttp2-dev \
-            python3-protobuf \
-            python3-grpcio \
-            python3-grpcio-tools
+            python3-protobuf
 
       - name: Install Android command line tools
         run: |
