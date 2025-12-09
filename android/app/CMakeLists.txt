@@ -11,9 +11,8 @@ add_library(chiaki-jni SHARED
     src/main/cpp/video-decoder.c
     src/main/cpp/audio-decoder.c
     src/main/cpp/audio-output.cpp
+    src/main/cpp/openssl_ui_stubs.c   # temporary stub for stdin/stderr
 )
-
-target_sources(chiaki-jni PRIVATE src/main/cpp/openssl_ui_stubs.c)
 
 # Ensure JNI sees chiaki headers
 target_include_directories(chiaki-jni
@@ -22,10 +21,8 @@ target_include_directories(chiaki-jni
         ${CMAKE_SOURCE_DIR}/lib/include
 )
 
-# --- NEW: pull in the core Chiaki library ---
+# --- Core Chiaki library ---
 add_subdirectory(${CMAKE_SOURCE_DIR}/lib ${CMAKE_BINARY_DIR}/chiaki-lib-build)
-
-# Link against the core Chiaki library
 target_link_libraries(chiaki-jni PRIVATE chiaki-lib)
 
 # Android system libraries
@@ -39,9 +36,13 @@ target_link_libraries(chiaki-jni PRIVATE
     ${ANDROID_LIB_ANDROID}
 )
 
-# Oboe (vendored, only once)
+# --- Oboe (vendored subproject) ---
 add_subdirectory(src/main/cpp/oboe)
-target_compile_options(oboe PRIVATE -include cassert)
+
+# Link chiaki-jni against oboe
+target_link_libraries(chiaki-jni PRIVATE oboe)
+
+# Ensure chiaki-jni can see Oboe headers
 target_include_directories(chiaki-jni PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src/main/cpp/oboe/include
 )
