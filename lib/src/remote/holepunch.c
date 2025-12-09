@@ -53,10 +53,10 @@
 
 #if defined(HAVE_JSON_C)
 #include <json-c/json_object.h>
-#endif
-
 #include <json-c/json_tokener.h>
 #include <json-c/json_pointer.h>
+#endif
+
 #include <miniupnpc/miniupnpc.h>
 #include <miniupnpc/upnpcommands.h>
 #include <miniupnpc/upnperrors.h>
