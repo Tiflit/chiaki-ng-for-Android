@@ -16,6 +16,8 @@
  
 // TODO: Make portable for Switch
 
+#if defined(HAVE_JSON_C) && defined(HAVE_MINIUPNPC)
+
 #include <string.h>
 #include <stdlib.h>
 #include <time.h>
@@ -5601,3 +5603,16 @@ static void remove_substring(char *str, char *substring)
     char *end = start + strlen(substring);
     memmove(start, start + strlen(substring), strlen(end) + 1);
 }
+
+//Disable #if defined(HAVE_JSON_C) && defined(HAVE_MINIUPNPC)
+#else
+
+#include <chiaki/log.h>
+
+// Provide minimal stubs so linking succeeds
+void chiaki_holepunch_init(ChiakiLog *log)
+{
+    CHIAKI_LOGI(log, "Holepunch disabled (no json-c/miniupnpc)");
+}
+
+#endif
