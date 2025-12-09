@@ -56,21 +56,37 @@ CHIAKI_EXPORT ChiakiErrorCode chiaki_thread_create(ChiakiThread *thread, ChiakiT
 	return CHIAKI_ERR_SUCCESS;
 }
 
-CHIAKI_EXPORT ChiakiErrorCode chiaki_thread_join(ChiakiThread *thread, void **retval)
+#if !__APPLE__ && !__SWITCH__
+CHIAKI_EXPORT ChiakiErrorCode chiaki_thread_timedjoin(ChiakiThread *thread, void **retval, uint64_t timeout_ms)
 {
 #if _WIN32
-	int r = WaitForSingleObject(thread->thread, INFINITE);
-	if(r != WAIT_OBJECT_0)
-		return CHIAKI_ERR_THREAD;
-	if(retval)
-		*retval = thread->ret;
+    int r = WaitForSingleObject(thread->thread, timeout_ms);
+    if(r != WAIT_OBJECT_0)
+        return CHIAKI_ERR_THREAD;
+    if(retval)
+        *retval = thread->ret;
 #else
-	int r = pthread_join(thread->thread, retval);
-	if(r != 0)
-		return CHIAKI_ERR_THREAD;
+    struct timespec timeout;
+    set_timeout(&timeout, timeout_ms);
+#if defined(__ANDROID__)
+    // Android's Bionic libc does not provide pthread_clockjoin_np.
+    // Fallback: blocking join.
+    int r = pthread_join(thread->thread, retval);
+    if(r != 0)
+        return CHIAKI_ERR_THREAD;
+#else
+    int r = pthread_clockjoin_np(thread->thread, retval, CLOCK_MONOTONIC, &timeout);
+    if(r != 0)
+    {
+        if(r == ETIMEDOUT)
+            return CHIAKI_ERR_TIMEOUT;
+        return CHIAKI_ERR_THREAD;
+    }
 #endif
-	return CHIAKI_ERR_SUCCESS;
+#endif
+    return CHIAKI_ERR_SUCCESS;
 }
+#endif
 
 //#define CHIAKI_WINDOWS_THREAD_NAME
 
@@ -255,23 +271,31 @@ static void set_timeout(struct timespec *timeout, uint64_t ms_from_now)
 CHIAKI_EXPORT ChiakiErrorCode chiaki_thread_timedjoin(ChiakiThread *thread, void **retval, uint64_t timeout_ms)
 {
 #if _WIN32
-	int r = WaitForSingleObject(thread->thread, timeout_ms);
-	if(r != WAIT_OBJECT_0)
-		return CHIAKI_ERR_THREAD;
-	if(retval)
-		*retval = thread->ret;
+    int r = WaitForSingleObject(thread->thread, timeout_ms);
+    if(r != WAIT_OBJECT_0)
+        return CHIAKI_ERR_THREAD;
+    if(retval)
+        *retval = thread->ret;
 #else
-	struct timespec timeout;
-	set_timeout(&timeout, timeout_ms);
-	int r = pthread_clockjoin_np(thread->thread, retval, CLOCK_MONOTONIC, &timeout);
-	if(r != 0)
-	{
-		if(r == ETIMEDOUT)
-			return CHIAKI_ERR_TIMEOUT;
-		return CHIAKI_ERR_THREAD;
-	}
+    struct timespec timeout;
+    set_timeout(&timeout, timeout_ms);
+#if defined(__ANDROID__)
+    // Android's Bionic libc does not provide pthread_clockjoin_np.
+    // Fallback: blocking join.
+    int r = pthread_join(thread->thread, retval);
+    if(r != 0)
+        return CHIAKI_ERR_THREAD;
+#else
+    int r = pthread_clockjoin_np(thread->thread, retval, CLOCK_MONOTONIC, &timeout);
+    if(r != 0)
+    {
+        if(r == ETIMEDOUT)
+            return CHIAKI_ERR_TIMEOUT;
+        return CHIAKI_ERR_THREAD;
+    }
 #endif
-	return CHIAKI_ERR_SUCCESS;
+#endif
+    return CHIAKI_ERR_SUCCESS;
 }
 #endif
 
